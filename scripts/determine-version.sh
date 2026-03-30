@@ -55,9 +55,9 @@ if [[ "$majorNew" -eq "$majorCurrent" ]] && [[ "$minorNew" -eq "$minorCurrent" ]
   if [[ "$hasExistingTag" == "false" ]]; then
     version="0.0.0"
     echo "VERSION=$version"
-    echo "First release: publishing version 0.0.0"
+    echo "::notice::First release: publishing version 0.0.0"
   else
-    echo "No version bump needed, skipping release"
+    echo "::notice::No version bump needed, skipping release"
     exit 0
   fi
 else
