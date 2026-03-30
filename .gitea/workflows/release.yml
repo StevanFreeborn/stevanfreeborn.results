@@ -15,10 +15,10 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
-      - name: Setup PowerShell LTS
-        uses: mchave3/setup-pwsh@v1.0.0
-        with:
-          version: 'stable'
+      - name: Setup PowerShell
+        run: |
+          sudo apk update
+          sudo apk add powershell
       - name: Determine version
         id: version
         run: pwsh -File scripts/determine-version.ps1 -Branch main | tee -a $env:GITHUB_OUTPUT
