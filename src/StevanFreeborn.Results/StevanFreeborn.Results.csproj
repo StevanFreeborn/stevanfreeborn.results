@@ -7,7 +7,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PackageId>StevanFreeborn.Results</PackageId>
-    <Version>0.0.0</Version>
+    <Version>0.0.1</Version>
     <Authors>Stevan Freeborn</Authors>
     <Description>A minimalistic, AOT-compatible Result type library for railway-oriented programming and functional error handling.</Description>
     <PackageTags>result;railway;functional;error-handling;discriminated-union</PackageTags>
