@@ -15,10 +15,10 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
-      - name: Install PowerShell
-        uses: PSModule/install-powershell@v1
+      - name: Setup PowerShell LTS
+        uses: mchave3/setup-pwsh@v1.0.0
         with:
-          Version: 7.6.0
+          version: 'stable'
       - name: Determine version
         id: version
         run: pwsh -File scripts/determine-version.ps1 -Branch main | tee -a $env:GITHUB_OUTPUT
