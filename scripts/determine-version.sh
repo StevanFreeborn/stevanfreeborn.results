@@ -54,13 +54,12 @@ fi
 if [[ "$majorNew" -eq "$majorCurrent" ]] && [[ "$minorNew" -eq "$minorCurrent" ]] && [[ "$patchNew" -eq "$patchCurrent" ]]; then
   if [[ "$hasExistingTag" == "false" ]]; then
     version="0.0.0"
-    echo "VERSION=$version"
-    echo "::notice::First release: publishing version 0.0.0"
+    echo "VERSION=$version" >> "$GITHUB_OUTPUT"
+    echo "First release: publishing version 0.0.0"
   else
-    echo "::notice::No version bump needed, skipping release"
     exit 0
   fi
 else
   version="$majorNew.$minorNew.$patchNew"
-  echo "VERSION=$version"
+  echo "VERSION=$version" >> "$GITHUB_OUTPUT"
 fi

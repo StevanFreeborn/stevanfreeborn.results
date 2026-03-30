@@ -19,7 +19,7 @@ jobs:
           dotnet-version: 10.0.x
       - name: Determine version
         id: version
-        run: ./scripts/determine-version.sh main | tee -a $GITHUB_OUTPUT
+        run: ./scripts/determine-version.sh main
       - name: Update version in csproj
         if: steps.version.outputs.VERSION
         run: ./scripts/update-version.sh "${{ steps.version.outputs.VERSION }}"
