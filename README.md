@@ -30,10 +30,10 @@ dotnet add package StevanFreeborn.Results
 using StevanFreeborn.Results;
 
 // Create a successful result
-Result<Unit, Error> ok = Result<Unit, Error>.Ok(default);
+Result<Unit, Error> ok = Result.Ok<Unit, Error>(default);
 
 // Create a failed result
-Result<Unit, Error> fail = Result<Unit, Error>.Fail(new Error("NotFound", "User not found"));
+Result<Unit, Error> fail = Result.Fail<Unit, Error>(new Error("NotFound", "User not found"));
 
 // Work with results that have values
 Result<int, Error> divisionResult = Divide(10, 2);
@@ -69,11 +69,11 @@ Result<User, DomainError> GetUser(int id)
 {
   if (id <= 0)
   {
-    return Result<User, DomainError>.Fail(new DomainError("InvalidId", "User ID must be positive"));
+    return Result.Fail<User, DomainError>(new DomainError("InvalidId", "User ID must be positive"));
   }
   
   // ... fetch user
-  return Result<User, DomainError>.Ok(user);
+  return Result.Ok<User, DomainError>(user);
 }
 
 // Chain with custom errors
@@ -122,14 +122,29 @@ Result<Unit, Error> operation = DoSomething();
 
 ## Result Types
 
+### `Result` (Static Factory Class)
+
+The static `Result` class provides factory methods for creating result instances:
+
+```csharp
+// Create successful result
+Result<int, Error> ok = Result.Ok<int, Error>(42);
+
+// Create failed result
+Result<int, Error> fail = Result.Fail<int, Error>(new Error("Failed", "Something went wrong"));
+
+// Wrap a function that may throw
+Result<string, Error> result = Result.Try<string, Error>(() => File.ReadAllText("file.txt"));
+```
+
 ### `Result<T, TError>`
 
 The main Result type with generic type parameters for both value and error:
 
 ```csharp
 // Creation
-Result<int, Error> ok = Result<int, Error>.Ok(42);
-Result<int, Error> fail = Result<int, Error>.Fail(new Error("Invalid", "Invalid input"));
+Result<int, Error> ok = Result.Ok<int, Error>(42);
+Result<int, Error> fail = Result.Fail<int, Error>(new Error("Invalid", "Invalid input"));
 
 // Check status
 if (result.IsSuccess) { /* ... */ }
@@ -147,8 +162,8 @@ Error error = result.Error;
 For operations that don't return a value, use `Unit`:
 
 ```csharp
-Result<Unit, Error> ok = Result<Unit, Error>.Ok(default);
-Result<Unit, Error> fail = Result<Unit, Error>.Fail(new Error("Failed", "Something went wrong"));
+Result<Unit, Error> ok = Result.Ok<Unit, Error>(default);
+Result<Unit, Error> fail = Result.Fail<Unit, Error>(new Error("Failed", "Something went wrong"));
 ```
 
 ## Functional Operations
@@ -158,8 +173,8 @@ Result<Unit, Error> fail = Result<Unit, Error>.Fail(new Error("Failed", "Somethi
 Transforms the value if success, propagates the error if failure.
 
 ```csharp
-Result<int, Error> ok = Result<int, Error>.Ok(5);
-Result<string, Error> mapped = ok.Map(x => x.ToString()); // Result<string, Error>.Ok("5")
+Result<int, Error> ok = Result.Ok<int, Error>(5);
+Result<string, Error> mapped = ok.Map(x => x.ToString()); // Result.Ok<string, Error>("5")
 ```
 
 ### MapError
@@ -167,7 +182,7 @@ Result<string, Error> mapped = ok.Map(x => x.ToString()); // Result<string, Erro
 Transforms the error if failure, propagates the value if success.
 
 ```csharp
-Result<int, Error> fail = Result<int, Error>.Fail(new Error("NotFound", "Not found"));
+Result<int, Error> fail = Result.Fail<int, Error>(new Error("NotFound", "Not found"));
 Result<int, Error> mapped = fail.MapError(e => new Error("Unexpected", e.Message));
 ```
 
@@ -212,10 +227,10 @@ Wraps a function that may throw an exception in a Result.
 
 ```csharp
 // Simple usage with default error handler
-Result<string, Error> result = Result<string, Error>.Try(() => File.ReadAllText("file.txt"));
+Result<string, Error> result = Result.Try<string, Error>(() => File.ReadAllText("file.txt"));
 
 // Custom error handler
-Result<string, Error> result = Result<string, Error>.Try(
+Result<string, Error> result = Result.Try<string, Error>(
   () => File.ReadAllText("file.txt"),
   ex => new Error("ReadError", ex.Message)
 );
@@ -241,7 +256,7 @@ string result = await result.MatchAsync(
 );
 
 // Async Try
-Result<string, Error> result = await ResultAsyncExtensions.TryAsync(
+Result<string, Error> result = await Result.TryAsync<string, Error>(
   () => HttpClient.GetStringAsync("https://api.example.com")
 );
 ```

@@ -7,42 +7,49 @@ public class ResultAsyncExtensionsTests
   [Test]
   public async Task MapAsync_WhenResultIsSuccess_ItShouldInvokeAsyncAction()
   {
-    var result = Result<Unit, Error>.Ok(default);
+    var result = Result.Ok<Unit, Error>(default);
     var invoked = false;
+
     await result.MapAsync(_ => { invoked = true; return Task.CompletedTask; });
+
     await Assert.That(invoked).IsTrue();
   }
 
   [Test]
   public async Task MapAsync_WhenResultIsFailure_ItShouldSkipAsyncAction()
   {
-    var result = Result<Unit, Error>.Fail(new Error("code", "message"));
+    var result = Result.Fail<Unit, Error>(new Error("code", "message"));
     var invoked = false;
+
     await result.MapAsync(_ => { invoked = true; return Task.CompletedTask; });
+
     await Assert.That(invoked).IsFalse();
   }
 
   [Test]
   public async Task MapAsync_WhenCalled_ItShouldReturnOriginalResult()
   {
-    var result = Result<Unit, Error>.Ok(default);
+    var result = Result.Ok<Unit, Error>(default);
     var mapped = await result.MapAsync(_ => Task.CompletedTask);
+
     await Assert.That(mapped.IsSuccess).IsTrue();
   }
 
   [Test]
   public async Task BindAsync_WhenResultIsSuccess_ItShouldInvokeBinderAndReturnResult()
   {
-    var result = Result<Unit, Error>.Ok(default);
-    var bound = await result.BindAsync(_ => Task.FromResult(Result<Unit, Error>.Fail(new Error("new_error", "new message"))));
+    var result = Result.Ok<Unit, Error>(default);
+    var bound = await result.BindAsync(_ => Task.FromResult(Result.Fail<Unit, Error>(new Error("new_error", "new message"))));
+
     await Assert.That(bound.IsFailure).IsTrue();
   }
 
   [Test]
   public async Task BindAsync_WhenResultIsFailure_ItShouldReturnOriginalResult()
   {
-    var result = Result<Unit, Error>.Fail(new Error("code", "message"));
-    var bound = await result.BindAsync(_ => Task.FromResult(Result<Unit, Error>.Ok(default)));
+    var result = Result.Fail<Unit, Error>(new Error("code", "message"));
+    var bound = await result.BindAsync(_ => Task.FromResult(Result.Ok<Unit, Error>(default)));
+
     await Assert.That(bound.IsFailure).IsTrue();
     await Assert.That(bound.Error.Code).IsEqualTo("code");
   }
@@ -50,16 +57,18 @@ public class ResultAsyncExtensionsTests
   [Test]
   public async Task MatchAsync_WhenResultIsSuccess_ItShouldReturnOnSuccessValue()
   {
-    var result = Result<Unit, Error>.Ok(default);
+    var result = Result.Ok<Unit, Error>(default);
     var matched = await result.MatchAsync(_ => Task.FromResult("success"), _ => Task.FromResult("failure"));
+
     await Assert.That(matched).IsEqualTo("success");
   }
 
   [Test]
   public async Task MatchAsync_WhenResultIsFailure_ItShouldReturnOnFailureValue()
   {
-    var result = Result<Unit, Error>.Fail(new Error("code", "message"));
+    var result = Result.Fail<Unit, Error>(new Error("code", "message"));
     var matched = await result.MatchAsync(_ => Task.FromResult("success"), e => Task.FromResult(e.Code));
+
     await Assert.That(matched).IsEqualTo("code");
   }
 
@@ -67,6 +76,7 @@ public class ResultAsyncExtensionsTests
   public async Task TryAsync_WhenActionSucceeds_ItShouldReturnOk()
   {
     var result = await ResultAsyncExtensions.TryAsync(() => Task.CompletedTask);
+
     await Assert.That(result.IsSuccess).IsTrue();
   }
 
@@ -74,6 +84,7 @@ public class ResultAsyncExtensionsTests
   public async Task TryAsync_WhenActionThrowsException_ItShouldReturnFailWithUnexpectedError()
   {
     var result = await ResultAsyncExtensions.TryAsync(() => throw new InvalidOperationException("test error"));
+
     await Assert.That(result.IsFailure).IsTrue();
     await Assert.That(result.Error.Code).IsEqualTo("UnexpectedError");
   }
@@ -82,8 +93,10 @@ public class ResultAsyncExtensionsTests
   public async Task TryAsync_WhenActionThrowsException_ItShouldUseCustomError()
   {
     var result = await ResultAsyncExtensions.TryAsync(
-        () => throw new InvalidOperationException("test"),
-        ex => new Error("custom", ex.Message));
+      () => throw new InvalidOperationException("test"),
+      ex => new Error("custom", ex.Message)
+    );
+
     await Assert.That(result.IsFailure).IsTrue();
     await Assert.That(result.Error.Code).IsEqualTo("custom");
   }
@@ -91,8 +104,9 @@ public class ResultAsyncExtensionsTests
   [Test]
   public async Task MapAsync_WhenResultIsSuccess_ItShouldTransformValue()
   {
-    var result = Result<int, Error>.Ok(5);
+    var result = Result.Ok<int, Error>(5);
     var mapped = await result.MapAsync(async n => (await Task.FromResult(n)).ToString(CultureInfo.InvariantCulture));
+
     await Assert.That(mapped.IsSuccess).IsTrue();
     await Assert.That(mapped.Value).IsEqualTo("5");
   }
@@ -101,8 +115,9 @@ public class ResultAsyncExtensionsTests
   public async Task MapAsync_WhenResultIsFailure_ItShouldPropagateError()
   {
     var error = new Error("code", "message");
-    var result = Result<int, Error>.Fail(error);
+    var result = Result.Fail<int, Error>(error);
     var mapped = await result.MapAsync(async n => (await Task.FromResult(n)).ToString(CultureInfo.InvariantCulture));
+
     await Assert.That(mapped.IsFailure).IsTrue();
     await Assert.That(mapped.Error).IsEqualTo(error);
   }
@@ -110,8 +125,9 @@ public class ResultAsyncExtensionsTests
   [Test]
   public async Task BindAsync_WhenResultIsSuccess_ItShouldChainToBinderResult()
   {
-    var result = Result<int, Error>.Ok(5);
-    var bound = await result.BindAsync(async n => await Task.FromResult(Result<string, Error>.Ok(n.ToString(CultureInfo.InvariantCulture))));
+    var result = Result.Ok<int, Error>(5);
+    var bound = await result.BindAsync(async n => await Task.FromResult(Result.Ok<string, Error>(n.ToString(CultureInfo.InvariantCulture))));
+
     await Assert.That(bound.IsSuccess).IsTrue();
     await Assert.That(bound.Value).IsEqualTo("5");
   }
@@ -120,8 +136,9 @@ public class ResultAsyncExtensionsTests
   public async Task BindAsync_WhenResultIsFailure_ItShouldPropagateError()
   {
     var error = new Error("code", "message");
-    var result = Result<int, Error>.Fail(error);
-    var bound = await result.BindAsync(async n => await Task.FromResult(Result<string, Error>.Ok(n.ToString(CultureInfo.InvariantCulture))));
+    var result = Result.Fail<int, Error>(error);
+    var bound = await result.BindAsync(async n => await Task.FromResult(Result.Ok<string, Error>(n.ToString(CultureInfo.InvariantCulture))));
+
     await Assert.That(bound.IsFailure).IsTrue();
     await Assert.That(bound.Error).IsEqualTo(error);
   }
@@ -129,20 +146,24 @@ public class ResultAsyncExtensionsTests
   [Test]
   public async Task MatchAsyncGeneric_WhenResultIsSuccess_ItShouldReturnOnSuccessValue()
   {
-    var result = Result<string, Error>.Ok("test");
+    var result = Result.Ok<string, Error>("test");
     var matched = await result.MatchAsync(
-        v => Task.FromResult(v.Length),
-        _ => Task.FromResult(0));
+      v => Task.FromResult(v.Length),
+      _ => Task.FromResult(0)
+    );
+
     await Assert.That(matched).IsEqualTo(4);
   }
 
   [Test]
   public async Task MatchAsyncGeneric_WhenResultIsFailure_ItShouldReturnOnFailureValue()
   {
-    var result = Result<string, Error>.Fail(new Error("code", "message"));
+    var result = Result.Fail<string, Error>(new Error("code", "message"));
     var matched = await result.MatchAsync(
-        v => Task.FromResult(v.Length),
-        _ => Task.FromResult(-1));
+      v => Task.FromResult(v.Length),
+      _ => Task.FromResult(-1)
+    );
+
     await Assert.That(matched).IsEqualTo(-1);
   }
 
@@ -150,6 +171,7 @@ public class ResultAsyncExtensionsTests
   public async Task TryAsync_WhenFuncSucceeds_ItShouldReturnOkWithValue()
   {
     var result = await ResultAsyncExtensions.TryAsync(async () => await Task.FromResult(42));
+
     await Assert.That(result.IsSuccess).IsTrue();
     await Assert.That(result.Value).IsEqualTo(42);
   }
@@ -158,6 +180,7 @@ public class ResultAsyncExtensionsTests
   public async Task TryAsync_WhenFuncThrowsException_ItShouldReturnFailWithUnexpectedError()
   {
     var result = await ResultAsyncExtensions.TryAsync<int>(() => throw new InvalidOperationException("test error"));
+
     await Assert.That(result.IsFailure).IsTrue();
     await Assert.That(result.Error.Code).IsEqualTo("UnexpectedError");
   }
@@ -166,8 +189,10 @@ public class ResultAsyncExtensionsTests
   public async Task TryAsync_WhenFuncThrowsException_ItShouldUseCustomError()
   {
     var result = await ResultAsyncExtensions.TryAsync<int>(
-        () => throw new InvalidOperationException("test"),
-        ex => new Error("custom", ex.Message));
+      () => throw new InvalidOperationException("test"),
+      ex => new Error("custom", ex.Message)
+    );
+
     await Assert.That(result.IsFailure).IsTrue();
     await Assert.That(result.Error.Code).IsEqualTo("custom");
   }

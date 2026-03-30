@@ -56,7 +56,7 @@ namespace StevanFreeborn.Results
         throw new ArgumentNullException(nameof(mapper));
       }
 
-      return result.IsFailure ? await mapper(result.Error).ConfigureAwait(false) : Result<T, TNewError>.Ok(result.Value);
+      return result.IsFailure ? await mapper(result.Error).ConfigureAwait(false) : Result.Ok<T, TNewError>(result.Value);
     }
 
     /// <summary>
@@ -177,11 +177,11 @@ namespace StevanFreeborn.Results
       try
       {
         await action().ConfigureAwait(false);
-        return Result<Unit, Error>.Ok(default);
+        return Result.Ok<Unit, Error>(default);
       }
       catch (Exception ex)
       {
-        return Result<Unit, Error>.Fail(errorHandler(ex));
+        return Result.Fail<Unit, Error>(errorHandler(ex));
       }
     }
 
@@ -208,7 +208,7 @@ namespace StevanFreeborn.Results
         throw new ArgumentNullException(nameof(binder));
       }
 
-      return result.IsSuccess ? await binder(result.Value).ConfigureAwait(false) : Result<TNew, TError>.Fail(result.Error);
+      return result.IsSuccess ? await binder(result.Value).ConfigureAwait(false) : Result.Fail<TNew, TError>(result.Error);
     }
 
     /// <summary>
@@ -278,11 +278,11 @@ namespace StevanFreeborn.Results
 
       try
       {
-        return Result<T, Error>.Ok(await func().ConfigureAwait(false));
+        return Result.Ok<T, Error>(await func().ConfigureAwait(false));
       }
       catch (Exception ex)
       {
-        return Result<T, Error>.Fail(errorHandler(ex));
+        return Result.Fail<T, Error>(errorHandler(ex));
       }
     }
   }

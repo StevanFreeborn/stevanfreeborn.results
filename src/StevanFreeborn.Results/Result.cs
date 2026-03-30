@@ -2,6 +2,79 @@ namespace StevanFreeborn.Results
 {
 
   /// <summary>
+  /// Static factory methods for creating result instances.
+  /// </summary>
+  public static class Result
+  {
+    /// <summary>
+    /// Creates a successful result with the specified value.
+    /// </summary>
+    /// <typeparam name="T">The type of the value.</typeparam>
+    /// <typeparam name="TError">The type of the error.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <returns>A successful <see cref="Result{T, TError}"/>.</returns>
+    public static Result<T, TError> Ok<T, TError>(T value) where TError : IError
+    {
+      return new Result<T, TError>(true, value, default);
+    }
+
+    /// <summary>
+    /// Creates a failed result with the specified error.
+    /// </summary>
+    /// <typeparam name="T">The type of the value.</typeparam>
+    /// <typeparam name="TError">The type of the error.</typeparam>
+    /// <param name="error">The error.</param>
+    /// <returns>A failed <see cref="Result{T, TError}"/>.</returns>
+    public static Result<T, TError> Fail<T, TError>(TError error) where TError : IError
+    {
+      return new Result<T, TError>(false, default!, error);
+    }
+
+    /// <summary>
+    /// Executes the specified function and wraps the result in a <see cref="Result{T, TError}"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of the value.</typeparam>
+    /// <typeparam name="TError">The type of the error.</typeparam>
+    /// <param name="func">The function to execute.</param>
+    /// <returns>A successful result with the return value if no exception is thrown; otherwise, a failed result.</returns>
+    public static Result<T, TError> Try<T, TError>(Func<T> func) where TError : IError
+    {
+      return Try(func, ex => (TError)(IError)new Error("UnexpectedError", ex.Message));
+    }
+
+    /// <summary>
+    /// Executes the specified function and wraps the result in a <see cref="Result{T, TError}"/> using the specified error handler.
+    /// </summary>
+    /// <typeparam name="T">The type of the value.</typeparam>
+    /// <typeparam name="TError">The type of the error.</typeparam>
+    /// <param name="func">The function to execute.</param>
+    /// <param name="errorHandler">The function to convert exceptions to errors.</param>
+    /// <returns>A successful result with the return value if no exception is thrown; otherwise, a failed result.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when func or errorHandler is null.</exception>
+    public static Result<T, TError> Try<T, TError>(Func<T> func, Func<Exception, TError> errorHandler) where TError : IError
+    {
+      if (func is null)
+      {
+        throw new ArgumentNullException(nameof(func));
+      }
+
+      if (errorHandler is null)
+      {
+        throw new ArgumentNullException(nameof(errorHandler));
+      }
+
+      try
+      {
+        return Ok<T, TError>(func());
+      }
+      catch (Exception ex)
+      {
+        return Fail<T, TError>(errorHandler(ex));
+      }
+    }
+  }
+
+  /// <summary>
   /// Represents a result with a value and error type, used for operations that either succeed with a value or fail with an error.
   /// </summary>
   /// <typeparam name="T">The type of the value.</typeparam>
@@ -43,32 +116,12 @@ namespace StevanFreeborn.Results
     }
 
     /// <summary>
-    /// Creates a successful result with the specified value.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>A successful <see cref="Result{T, TError}"/>.</returns>
-    public static Result<T, TError> Ok(T value)
-    {
-      return new Result<T, TError>(true, value, default);
-    }
-
-    /// <summary>
-    /// Creates a failed result with the specified error.
-    /// </summary>
-    /// <param name="error">The error.</param>
-    /// <returns>A failed <see cref="Result{T, TError}"/>.</returns>
-    public static Result<T, TError> Fail(TError error)
-    {
-      return new Result<T, TError>(false, default!, error);
-    }
-
-    /// <summary>
     /// Implicitly converts a value to a successful <see cref="Result{T, TError}"/>.
     /// </summary>
     /// <param name="value">The value to convert.</param>
     public static implicit operator Result<T, TError>(T value)
     {
-      return Ok(value);
+      return Result.Ok<T, TError>(value);
     }
 
     /// <summary>
@@ -77,7 +130,7 @@ namespace StevanFreeborn.Results
     /// <param name="error">The error to convert.</param>
     public static implicit operator Result<T, TError>(TError error)
     {
-      return Fail(error);
+      return Result.Fail<T, TError>(error);
     }
 
     /// <summary>
@@ -94,7 +147,7 @@ namespace StevanFreeborn.Results
         throw new ArgumentNullException(nameof(mapper));
       }
 
-      return IsSuccess ? Result<TNew, TError>.Ok(mapper(Value)) : Result<TNew, TError>.Fail(Error);
+      return IsSuccess ? Result.Ok<TNew, TError>(mapper(Value)) : Result.Fail<TNew, TError>(Error);
     }
 
     /// <summary>
@@ -110,7 +163,7 @@ namespace StevanFreeborn.Results
         throw new ArgumentNullException(nameof(mapper));
       }
 
-      return IsFailure ? Result<T, TNewError>.Fail(mapper(Error)) : Result<T, TNewError>.Ok(Value);
+      return IsFailure ? Result.Fail<T, TNewError>(mapper(Error)) : Result.Ok<T, TNewError>(Value);
     }
 
     /// <summary>
@@ -127,7 +180,7 @@ namespace StevanFreeborn.Results
         throw new ArgumentNullException(nameof(binder));
       }
 
-      return IsSuccess ? binder(Value) : Result<TNew, TError>.Fail(Error);
+      return IsSuccess ? binder(Value) : Result.Fail<TNew, TError>(Error);
     }
 
     /// <summary>
@@ -219,45 +272,6 @@ namespace StevanFreeborn.Results
         action();
       }
       return this;
-    }
-
-    /// <summary>
-    /// Executes the specified function and wraps the result in a <see cref="Result{T, TError}"/>.
-    /// </summary>
-    /// <param name="func">The function to execute.</param>
-    /// <returns>A successful result with the return value if no exception is thrown; otherwise, a failed result.</returns>
-    public static Result<T, TError> Try(Func<T> func)
-    {
-      return Try(func, ex => (TError)(IError)new Error("UnexpectedError", ex.Message));
-    }
-
-    /// <summary>
-    /// Executes the specified function and wraps the result in a <see cref="Result{T, TError}"/> using the specified error handler.
-    /// </summary>
-    /// <param name="func">The function to execute.</param>
-    /// <param name="errorHandler">The function to convert exceptions to errors.</param>
-    /// <returns>A successful result with the return value if no exception is thrown; otherwise, a failed result.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when func or errorHandler is null.</exception>
-    public static Result<T, TError> Try(Func<T> func, Func<Exception, TError> errorHandler)
-    {
-      if (func is null)
-      {
-        throw new ArgumentNullException(nameof(func));
-      }
-
-      if (errorHandler is null)
-      {
-        throw new ArgumentNullException(nameof(errorHandler));
-      }
-
-      try
-      {
-        return Ok(func());
-      }
-      catch (Exception ex)
-      {
-        return Fail(errorHandler(ex));
-      }
     }
   }
 
