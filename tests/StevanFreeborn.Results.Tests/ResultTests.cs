@@ -16,7 +16,7 @@ public class ResultTests
   {
     var error = new Error("code", "message");
     var result = Result.Fail<Unit, Error>(error);
-    
+
     await Assert.That(result.IsSuccess).IsFalse();
     await Assert.That(result.IsFailure).IsTrue();
     await Assert.That(result.Error).IsEqualTo(error);

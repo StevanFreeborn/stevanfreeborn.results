@@ -2,8 +2,8 @@
 
 [![NuGet](https://img.shields.io/nuget/v/StevanFreeborn.Results.svg)](https://www.nuget.org/packages/StevanFreeborn.Results)
 [![NuGet](https://img.shields.io/nuget/dt/StevanFreeborn.Results.svg)](https://www.nuget.org/packages/StevanFreeborn.Results)
-[![Build](https://github.com/StevanFreeborn/stevanfreeborn.results/actions/workflows/ci.yaml/badge.svg)](https://github.com/StevanFreeborn/stevanfreeborn.results/actions/workflows/ci.yaml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build](https://gitea.freeborn.cloud/Stevan/stevanfreeborn.results/actions/workflows/ci.yml/badge.svg)](https://github.com/StevanFreeborn/stevanfreeborn.results/actions/workflows/ci.yaml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE.md)
 
 A minimalistic, AOT-compatible Result type library with support for custom error types, for railway-oriented programming and functional error handling in .NET.
 

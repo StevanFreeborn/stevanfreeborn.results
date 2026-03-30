@@ -19,15 +19,23 @@ namespace StevanFreeborn.Results
     public static async Task<Result<TNew, TError>> MapAsync<T, TNew, TError>(this Result<T, TError> result, Func<T, Task<TNew>> mapper)
         where TError : IError
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(result);
+#else
       if (result is null)
       {
         throw new ArgumentNullException(nameof(result));
       }
+#endif
 
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(mapper);
+#else
       if (mapper is null)
       {
         throw new ArgumentNullException(nameof(mapper));
       }
+#endif
 
       return result.IsSuccess ? await mapper(result.Value).ConfigureAwait(false) : result.Error;
     }
@@ -46,15 +54,23 @@ namespace StevanFreeborn.Results
         where TError : IError
         where TNewError : IError
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(result);
+#else
       if (result is null)
       {
         throw new ArgumentNullException(nameof(result));
       }
+#endif
 
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(mapper);
+#else
       if (mapper is null)
       {
         throw new ArgumentNullException(nameof(mapper));
       }
+#endif
 
       return result.IsFailure ? await mapper(result.Error).ConfigureAwait(false) : Result.Ok<T, TNewError>(result.Value);
     }
@@ -70,15 +86,23 @@ namespace StevanFreeborn.Results
     public static async Task<Result<Unit, TError>> MapAsync<TError>(this Result<Unit, TError> result, Func<Unit, Task> onSuccess)
         where TError : IError
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(result);
+#else
       if (result is null)
       {
         throw new ArgumentNullException(nameof(result));
       }
+#endif
 
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(onSuccess);
+#else
       if (onSuccess is null)
       {
         throw new ArgumentNullException(nameof(onSuccess));
       }
+#endif
 
       if (result.IsSuccess)
       {
@@ -99,15 +123,23 @@ namespace StevanFreeborn.Results
     public static async Task<Result<Unit, TError>> BindAsync<TError>(this Result<Unit, TError> result, Func<Unit, Task<Result<Unit, TError>>> onSuccess)
         where TError : IError
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(result);
+#else
       if (result is null)
       {
         throw new ArgumentNullException(nameof(result));
       }
+#endif
 
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(onSuccess);
+#else
       if (onSuccess is null)
       {
         throw new ArgumentNullException(nameof(onSuccess));
       }
+#endif
 
       return result.IsSuccess ? await onSuccess(result.Value).ConfigureAwait(false) : result;
     }
@@ -125,20 +157,32 @@ namespace StevanFreeborn.Results
     public static async Task<TResult> MatchAsync<TResult, TError>(this Result<Unit, TError> result, Func<Unit, Task<TResult>> onSuccess, Func<TError, Task<TResult>> onFailure)
         where TError : IError
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(result);
+#else
       if (result is null)
       {
         throw new ArgumentNullException(nameof(result));
       }
+#endif
 
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(onSuccess);
+#else
       if (onSuccess is null)
       {
         throw new ArgumentNullException(nameof(onSuccess));
       }
+#endif
 
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(onFailure);
+#else
       if (onFailure is null)
       {
         throw new ArgumentNullException(nameof(onFailure));
       }
+#endif
 
       return result.IsSuccess
           ? await onSuccess(result.Value).ConfigureAwait(false)
@@ -164,15 +208,23 @@ namespace StevanFreeborn.Results
     /// <exception cref="ArgumentNullException">Thrown when action or errorHandler is null.</exception>
     public static async Task<Result<Unit, Error>> TryAsync(Func<Task> action, Func<Exception, Error> errorHandler)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(action);
+#else
       if (action is null)
       {
         throw new ArgumentNullException(nameof(action));
       }
+#endif
 
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(errorHandler);
+#else
       if (errorHandler is null)
       {
         throw new ArgumentNullException(nameof(errorHandler));
       }
+#endif
 
       try
       {
@@ -198,15 +250,23 @@ namespace StevanFreeborn.Results
     public static async Task<Result<TNew, TError>> BindAsync<T, TNew, TError>(this Result<T, TError> result, Func<T, Task<Result<TNew, TError>>> binder)
         where TError : IError
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(result);
+#else
       if (result is null)
       {
         throw new ArgumentNullException(nameof(result));
       }
+#endif
 
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(binder);
+#else
       if (binder is null)
       {
         throw new ArgumentNullException(nameof(binder));
       }
+#endif
 
       return result.IsSuccess ? await binder(result.Value).ConfigureAwait(false) : Result.Fail<TNew, TError>(result.Error);
     }
@@ -225,20 +285,32 @@ namespace StevanFreeborn.Results
     public static async Task<TResult> MatchAsync<T, TResult, TError>(this Result<T, TError> result, Func<T, Task<TResult>> onSuccess, Func<TError, Task<TResult>> onFailure)
         where TError : IError
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(result);
+#else
       if (result is null)
       {
         throw new ArgumentNullException(nameof(result));
       }
+#endif
 
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(onSuccess);
+#else
       if (onSuccess is null)
       {
         throw new ArgumentNullException(nameof(onSuccess));
       }
+#endif
 
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(onFailure);
+#else
       if (onFailure is null)
       {
         throw new ArgumentNullException(nameof(onFailure));
       }
+#endif
 
       return result.IsSuccess
           ? await onSuccess(result.Value).ConfigureAwait(false)
@@ -266,15 +338,23 @@ namespace StevanFreeborn.Results
     /// <exception cref="ArgumentNullException">Thrown when func or errorHandler is null.</exception>
     public static async Task<Result<T, Error>> TryAsync<T>(Func<Task<T>> func, Func<Exception, Error> errorHandler)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(func);
+#else
       if (func is null)
       {
         throw new ArgumentNullException(nameof(func));
       }
+#endif
 
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(errorHandler);
+#else
       if (errorHandler is null)
       {
         throw new ArgumentNullException(nameof(errorHandler));
       }
+#endif
 
       try
       {

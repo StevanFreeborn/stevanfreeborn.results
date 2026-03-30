@@ -53,15 +53,23 @@ namespace StevanFreeborn.Results
     /// <exception cref="ArgumentNullException">Thrown when func or errorHandler is null.</exception>
     public static Result<T, TError> Try<T, TError>(Func<T> func, Func<Exception, TError> errorHandler) where TError : IError
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(func);
+#else
       if (func is null)
       {
         throw new ArgumentNullException(nameof(func));
       }
+#endif
 
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(errorHandler);
+#else
       if (errorHandler is null)
       {
         throw new ArgumentNullException(nameof(errorHandler));
       }
+#endif
 
       try
       {
@@ -142,10 +150,14 @@ namespace StevanFreeborn.Results
     /// <exception cref="ArgumentNullException">Thrown when mapper is null.</exception>
     public Result<TNew, TError> Map<TNew>(Func<T, TNew> mapper)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(mapper);
+#else
       if (mapper is null)
       {
         throw new ArgumentNullException(nameof(mapper));
       }
+#endif
 
       return IsSuccess ? Result.Ok<TNew, TError>(mapper(Value)) : Result.Fail<TNew, TError>(Error);
     }
@@ -158,10 +170,14 @@ namespace StevanFreeborn.Results
     /// <exception cref="ArgumentNullException">Thrown when mapper is null.</exception>
     public Result<T, TNewError> MapError<TNewError>(Func<TError, TNewError> mapper) where TNewError : IError
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(mapper);
+#else
       if (mapper is null)
       {
         throw new ArgumentNullException(nameof(mapper));
       }
+#endif
 
       return IsFailure ? Result.Fail<T, TNewError>(mapper(Error)) : Result.Ok<T, TNewError>(Value);
     }
@@ -175,10 +191,14 @@ namespace StevanFreeborn.Results
     /// <exception cref="ArgumentNullException">Thrown when binder is null.</exception>
     public Result<TNew, TError> Bind<TNew>(Func<T, Result<TNew, TError>> binder)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(binder);
+#else
       if (binder is null)
       {
         throw new ArgumentNullException(nameof(binder));
       }
+#endif
 
       return IsSuccess ? binder(Value) : Result.Fail<TNew, TError>(Error);
     }
@@ -193,15 +213,23 @@ namespace StevanFreeborn.Results
     /// <exception cref="ArgumentNullException">Thrown when onSuccess or onFailure is null.</exception>
     public TResult Match<TResult>(Func<T, TResult> onSuccess, Func<TError, TResult> onFailure)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(onSuccess);
+#else
       if (onSuccess is null)
       {
         throw new ArgumentNullException(nameof(onSuccess));
       }
+#endif
 
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(onFailure);
+#else
       if (onFailure is null)
       {
         throw new ArgumentNullException(nameof(onFailure));
       }
+#endif
 
       return IsSuccess ? onSuccess(Value) : onFailure(Error);
     }
@@ -214,15 +242,23 @@ namespace StevanFreeborn.Results
     /// <exception cref="ArgumentNullException">Thrown when onSuccess or onFailure is null.</exception>
     public void Match(Action<T> onSuccess, Action<TError> onFailure)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(onSuccess);
+#else
       if (onSuccess is null)
       {
         throw new ArgumentNullException(nameof(onSuccess));
       }
+#endif
 
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(onFailure);
+#else
       if (onFailure is null)
       {
         throw new ArgumentNullException(nameof(onFailure));
       }
+#endif
 
       if (IsSuccess)
       {
@@ -242,10 +278,14 @@ namespace StevanFreeborn.Results
     /// <exception cref="ArgumentNullException">Thrown when action is null.</exception>
     public Result<T, TError> Map(Action<T> action)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(action);
+#else
       if (action is null)
       {
         throw new ArgumentNullException(nameof(action));
       }
+#endif
 
       if (IsSuccess)
       {
@@ -262,10 +302,14 @@ namespace StevanFreeborn.Results
     /// <exception cref="ArgumentNullException">Thrown when action is null.</exception>
     public Result<T, TError> Map(Action action)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(action);
+#else
       if (action is null)
       {
         throw new ArgumentNullException(nameof(action));
       }
+#endif
 
       if (IsSuccess)
       {
