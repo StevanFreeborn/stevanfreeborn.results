@@ -12,7 +12,7 @@
     <Description>A minimalistic, AOT-compatible Result type library for railway-oriented programming and functional error handling.</Description>
     <PackageTags>result;railway;functional;error-handling;discriminated-union</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://gitea.freeborn.cloud/Stevan/stevanfreeborn.results</ProjectPackageUrl>
+    <PackageProjectUrl>https://gitea.freeborn.cloud/Stevan/stevanfreeborn.results</PackageProjectUrl>
     <RepositoryUrl>https://gitea.freeborn.cloud/Stevan/stevanfreeborn.results</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
