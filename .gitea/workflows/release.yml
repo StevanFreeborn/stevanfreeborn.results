@@ -50,7 +50,7 @@ jobs:
         run: dotnet test --configuration Release --no-build --verbosity normal
       - name: Pack
         if: steps.version.outputs.VERSION
-        run: dotnet pack --configuration Release --no-build --output ./artifacts /p:PackageVersion=${{ steps.version.outputs.VERSION }}
+        run: dotnet pack --configuration Release --no-build --output ./artifacts
       - name: Push to NuGet
         if: steps.version.outputs.VERSION
         run: dotnet nuget push ./artifacts/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}

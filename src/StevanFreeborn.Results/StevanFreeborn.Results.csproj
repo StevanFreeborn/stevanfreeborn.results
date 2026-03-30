@@ -11,7 +11,6 @@
     <Authors>Stevan Freeborn</Authors>
     <Description>A minimalistic, AOT-compatible Result type library for railway-oriented programming and functional error handling.</Description>
     <PackageTags>result;railway;functional;error-handling;discriminated-union</PackageTags>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://gitea.freeborn.cloud/Stevan/stevanfreeborn.results</PackageProjectUrl>
     <RepositoryUrl>https://gitea.freeborn.cloud/Stevan/stevanfreeborn.results</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -19,13 +18,12 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <DebugType>embedded</DebugType>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="..\..\README.md" Link="README.md" />
-    <None Include="..\..\LICENSE.md" Link="LICENSE.md" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\LICENSE.md" Pack="true" PackagePath="\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.Gitea">
