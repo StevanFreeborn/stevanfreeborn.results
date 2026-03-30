@@ -15,17 +15,12 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
-      - name: Setup PowerShell
-        run: |
-          sudo apk update
-          sudo apk add powershell
       - name: Determine version
         id: version
-        run: pwsh -File scripts/determine-version.ps1 -Branch main | tee -a $env:GITHUB_OUTPUT
-        shell: pwsh
+        run: ./scripts/determine-version.sh main | tee -a $GITHUB_OUTPUT
       - name: Update version in csproj
         if: steps.version.outputs.VERSION
-        run: pwsh -File scripts/update-version.ps1 -Version "${{ steps.version.outputs.VERSION }}"
+        run: ./scripts/update-version.sh "${{ steps.version.outputs.VERSION }}"
       - name: Create commit
         if: steps.version.outputs.VERSION
         run: |
