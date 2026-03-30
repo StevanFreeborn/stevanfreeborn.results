@@ -17,78 +17,11 @@ jobs:
           dotnet-version: 10.0.x
       - name: Determine version
         id: version
-        run: |
-          $commits = git log main..HEAD --format="%s"
-          $commitList = $commits -split "`n"
-          $major = 0
-          $minor = 0
-          $patch = 0
-
-          foreach ($message in $commitList) {
-            if ($message -match " BREAKING CHANGE|!:") {
-              $major = 1
-            } elseif ($message -match "^feat(\(.*\))?:") {
-              $minor = 1
-            } elseif ($message -match "^fix(\(.*\))?:") {
-              $patch = 1
-            }
-          }
-
-          if ($major -eq 1) {
-            $minor = 0
-            $patch = 0
-          } elseif ($minor -eq 1) {
-            $patch = 0
-          } elseif ($patch -eq 0 -and $commitList.Count -gt 0 -and $commitList[0]) {
-            $patch = 1
-          }
-
-          $currentVersion = "0.0.0"
-          $tag = git describe --tags --abbrev=0 2>$null
-
-          $hasExistingTag = $false
-          if ($tag) {
-            $hasExistingTag = $true
-            $currentVersion = $tag -replace "^v", ""
-          }
-
-          $parts = $currentVersion.Split(".")
-          $majorCurrent = [int]$parts[0]
-          $minorCurrent = [int]$parts[1]
-          $patchCurrent = [int]$parts[2]
-
-          $majorNew = $majorCurrent + $major
-          $minorNew = if ($major -eq 1) { 0 } else { $minorCurrent + $minor }
-          $patchNew = if ($major -eq 1 -or $minor -eq 1) { 0 } else { $patchCurrent + $patch }
-
-          if ($majorNew -eq $majorCurrent -and $minorNew -eq $minorCurrent -and $patchNew -eq $patchCurrent) {
-            if (-not $hasExistingTag) {
-              $version = "0.0.0"
-              echo "VERSION=$version" >> $env:GITHUB_OUTPUT
-              Write-Host "First release: publishing version 0.0.0"
-            } else {
-              Write-Host "No version bump needed, skipping release"
-              exit 0
-            }
-          } else {
-            $version = "$majorNew.$minorNew.$patchNew"
-            echo "VERSION=$version" >> $env:GITHUB_OUTPUT
-          }
+        run: pwsh -File scripts/determine-version.ps1 -Branch main | tee -a $env:GITHUB_OUTPUT
         shell: pwsh
       - name: Update version in csproj
         if: steps.version.outputs.VERSION
-        run: |
-          $version = "${{ steps.version.outputs.VERSION }}"
-          $csprojPath = "src/StevanFreeborn.Results/StevanFreeborn.Results.csproj"
-          $content = Get-Content $csprojPath -Raw
-
-          if ($content -match "<Version>.*?</Version>") {
-            $content = $content -replace "<Version>.*?</Version>", "<Version>$version</Version>"
-          } elseif ($content -match "<PropertyGroup>") {
-            $content = $content -replace "<PropertyGroup>", "<PropertyGroup>`n    <Version>$version</Version>"
-          }
-
-          Set-Content -Path $csprojPath -Value $content
+        run: pwsh -File scripts/update-version.ps1 -Version "${{ steps.version.outputs.VERSION }}"
       - name: Create commit
         if: steps.version.outputs.VERSION
         run: |
