@@ -2,7 +2,10 @@ param(
   [string]$Branch = "main"
 )
 
-$commits = git log $Branch..HEAD --format="%s"
+$tag = git describe --tags --abbrev=0 2>$null
+$base = if ($tag) { $tag } else { $Branch }
+
+$commits = git log "$base..HEAD" --format="%s"
 $commitList = $commits -split "`n"
 $major = 0
 $minor = 0
@@ -11,9 +14,9 @@ $patch = 0
 foreach ($message in $commitList) {
   if ($message -match " BREAKING CHANGE|!:" -and $message.Trim().Length -gt 0) {
     $major = 1
-  } elseif ($message -match "^feat(\(.*\))?:" -and $message.Trim().Length -gt 0) {
+  } elseif ($message -match "feat(\(.*\))?:" -and $message.Trim().Length -gt 0) {
     $minor = 1
-  } elseif ($message -match "^fix(\(.*\))?:" -and $message.Trim().Length -gt 0) {
+  } elseif ($message -match "fix(\(.*\))?:" -and $message.Trim().Length -gt 0) {
     $patch = 1
   }
 }
@@ -28,7 +31,6 @@ if ($major -eq 1) {
 }
 
 $currentVersion = "0.0.0"
-$tag = git describe --tags --abbrev=0 2>$null
 $hasExistingTag = $false
 
 if ($tag) {
